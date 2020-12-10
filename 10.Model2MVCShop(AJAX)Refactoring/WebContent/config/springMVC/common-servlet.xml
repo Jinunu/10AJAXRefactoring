@@ -82,6 +82,12 @@
 		<property name="defaultErrorView"	value="/common/error.jsp" />
 		
 	</bean>
+		<bean id="multipartResolver"
+	class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	<!-- one of the properties available; the maximum file size in bytes -->
+	<property name="defaultEncoding" value="EUC-KR" />
+</bean>
+	
 	
 
 	 <!-- /////// Client 에서 전달되는 JSON Data 를 Domain Object 롤 변환 받기위한 설정 ///////-->

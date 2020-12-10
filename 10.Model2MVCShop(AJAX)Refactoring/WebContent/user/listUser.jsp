@@ -38,13 +38,47 @@
 			});
 			
 			
+			
+			
 			//==> userId LINK Event 연결처리
 			//==> DOM Object GET 3가지 방법 ==> 1. $(tagName) : 2.(#id) : 3.$(.className)
 			//==> 3 과 1 방법 조합 : $(".className tagName:filter함수") 사용함.
 			$( ".ct_list_pop td:nth-child(3)" ).on("click" , function() {
-					//Debug..
-					//alert(  $( this ).text().trim() );
-					self.location ="/user/getUser?userId="+$(this).text().trim();
+					
+				var userId = $(this).text().trim();
+				alert(userId)
+				$.ajax( 
+						{
+							url : "/user/json/getUser/"+userId ,
+							method : "GET" ,
+							dataType : "json" ,
+							headers : {
+								"Accept" : "application/json",
+								"Content-Type" : "application/json"
+							},
+							success : function(JSONData , status) {
+
+								//Debug...
+								//alert(status);
+								//Debug...
+								//alert("JSONData : \n"+JSONData);
+								//alert(JSONData.userId)
+								//var link = "<a href=\"/user/getUser?userId="+userId+"\"\">수정</a>";
+								var displayValue = "<h3>"
+															+"아이디 : "+JSONData.userId+"<br/>"
+															+"이  름 : "+JSONData.userName+"<br/>"
+															+"이메일 : "+JSONData.email+"<br/>"
+															+"ROLE : "+JSONData.role+"<br/>"
+															+"등록일 : "+JSONData.regDate+"<a href=\"/user/getUser?userId="+userId+"\"\">		(회원정보 수정)</a>"+"<br/>"
+															+"</h3>";
+								//Debug...									\
+								//alert(displayValue);<div id=\""+"update\""+">수정</div>"+
+								$("h3").remove();
+								$( "#"+userId+"" ).html(displayValue);
+							}
+					});
+				
+					/* self.location ="/user/getUser?userId="+$(this).text().trim(); */
 			});
 			
 			//==> UI 수정 추가부분  :  userId LINK Event End User 에게 보일수 있도록 
@@ -62,6 +96,8 @@
 			//console.log ( $(".ct_list_pop:nth-child(5)" ).html() ); 
 			//console.log ( $(".ct_list_pop:nth-child(6)" ).html() ); //==> ok
 			//console.log ( $(".ct_list_pop:nth-child(7)" ).html() ); 
+			//console.log ( $(".ct_list_pop:nth-child(10)" ).html() ); 
+			//console.log ( $(".ct_list_pop:nth-child(14)" ).html() ); 
 		});	
 	</script>		
 	
@@ -154,6 +190,7 @@
 			<td align="center">${ i }</td>
 			<td></td>
 			<td align="left">
+			
 				<!-- ////////////////// jQuery Event 처리로 변경됨 /////////////////////////
 				<a href="/user/getUser?userId=${user.userId}">${user.userId}</a>
 				////////////////////////////////////////////////////////////////////////////////////////////////// -->
@@ -166,7 +203,8 @@
 			</td>		
 		</tr>
 		<tr>
-		<td colspan="11" bgcolor="D6D7D6" height="1"></td>
+		<!-- <td colspan="11" bgcolor="D6D7D6" height="1"></td> -->
+		<td id="${user.userId}" colspan="11" bgcolor="D6D7D6" height="1"></td>
 		</tr>
 	</c:forEach>
 </table>
@@ -176,9 +214,12 @@
 <table width="100%" border="0" cellspacing="0" cellpadding="0"	style="margin-top:10px;">
 	<tr>
 		<td align="center">
-		   <input type="hidden" id="currentPage" name="currentPage" value=""/>
+		<input type="hidden" id="currentPage" name="currentPage" value=""/>
+		   <c:set var="fnc" value="fncGetUserList" scope="request" />
 	
-			<jsp:include page="../common/pageNavigator.jsp"/>	
+	<c:import var="pageNavi" url="/common/pageNavigator.jsp" scope="request"/>
+	${pageNavi}
+	
 			
     	</td>
 	</tr>
