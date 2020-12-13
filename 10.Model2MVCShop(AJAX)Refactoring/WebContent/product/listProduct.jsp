@@ -30,10 +30,15 @@ $(function() {
 		}
 		
 	})
-	
-	$( ".ct_list_pop td:nth-child(3) img" ).on("mouseover" , function() {
-		/* alert("접근")
-		alert($(this).attr("id")) */
+	$(document).on("mouseleave",".ct_list_pop td:nth-child(3) img",function(){
+	//$( ".ct_list_pop td:nth-child(3) img" ).on("mouseleave" , function() {
+		$("h3").remove();
+	}
+	);
+	$(document).on("mouseover",".ct_list_pop td:nth-child(3) img",function(){
+	//$( ".ct_list_pop td:nth-child(3) img" ).on("mouseover" , function() {
+		// alert("접근")
+	//	alert($(this).attr("id"))
 		var prodNo = $(this).attr("id");
 		$.ajax( 
 				{
@@ -69,6 +74,116 @@ $(function() {
 	$( "#배송하기" ).css('color','red').on("click" , function() {
 		self.location ="/purchase/updateTranCode?tranCode="+$(this).find("input[name='proTranCode']").val()+"&prodNo="+$(this).find("input[name='prodNo']").val()
 });
+	
+	var page = $("#currentPage").val(); 
+	$(window).scroll(function() {
+		
+	    if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+	    	$("#currentPage").val(page++);
+	    	var searchKeyword = $("#searchKeyword").val();
+	    	var searchCondition = $("#searchCondition").val();
+	      console.log(page);
+	      $.ajax( 
+					{
+						url : "/product/json/getProductList/" ,
+						method : "POST" ,
+						data : JSON.stringify({currentPage : page, searchKeyword : searchKeyword, searchCondition : searchCondition  }),
+						dataType : "json" ,
+						headers : {
+							"Accept" : "application/json",
+							"Content-Type" : "application/json"
+						},
+						success : function(JSONData , status) {
+
+							//Debug...
+							//alert(status);
+							//alert(JSONData)
+							
+							
+							//Debug...
+							//console.log("JSONData : \n"+JSON.stringify(JSONData.list[0]));
+							//console.log("내용"+JSONData.list[0].prodName);
+							//console.log("사이즈"+JSONData.list.length)
+							var pageNumber = $(".ct_list_pop td:nth-child(1):last").text().trim();
+							//console.log( $(".view:last"));
+							if(${menu}='manage'){
+								var menu = 'manage';
+							}else{
+								var menu = 'search'
+							}
+							
+							console.log(menu)
+							$.each(JSONData.list, function(index, item) {
+								//console.log(item.prodName);
+								//alert(item.proTranCode)
+								//var str2 = item.proTranCode
+								//console.log("코드='"+str2+"'")
+								
+								pageNumber = Number(pageNumber)+1;
+								var str = "";
+								str = '<tr class="ct_list_pop">'
+								+'<td align="center">'+pageNumber+'</td>'
+								+'<td></td>'
+								+'<td align="left">'
+								+'<a href="/product/getProduct?prodNo='+item.prodNo+'&menu=${menu}">';
+								if(item.fileName!=null ){
+									str+='<img id="'+item.prodNo+'"  src="/images/uploadFiles/'+item.fileName+'" width="100" height="100"  />';
+								}else{
+									str+='<img id="'+item.prodNo+'" src="http://placehold.it/100X100" />';
+								}
+								str+='</a>'+item.prodName+'</td>'
+								
+								+'<td></td>'
+								+'<td align="left">'+item.price+'</td>'
+								+'<td></td>'
+								+'<td align="left">'+item.regDate+'</td>';
+								if(menu!='manage'){
+									if(item.proTranCode==null){
+										str+='<td align="left">판매중';
+									}else{
+										str+='<td align="left">재고없음';
+									}
+									
+								}else if(menu=='manage'){
+									if(item.proTranCode==null){
+										str+='<td align="left">판매중';
+									}else if(item.proTranCode=='0  '){
+										str+='<td align="left"> '
+											+'<div align="letf" >구매완료</div> '
+											+'<div align="letf" id="배송하기"><input type="hidden" name="prodNo" value="'+item.prodNo+'">'
+											+'<input type="hidden" name="proTranCode" value="'+item.proTranCode+'">'
+											+'(배송하기)</div> ';
+									}else if(item.proTranCode=='1  '){
+										str+='<td align="left">배송중</td>';
+									}else if(item.proTranCode=='2  '){
+										str+='<td align="left">배송완료</td>';
+									}
+								}str+='<td></td>'
+								+'</tr>'
+								+'<tr >'
+								+'<td class="view" id="'+item.prodNo+'view" colspan="11" bgcolor="D6D7D6" height="1"></td>'
+								+'</tr>';
+								//console.log(pageNumber); // 다추가 해놓고 거기에 값을 변경 해주자 ..
+								//'<h1>pageNumber<h1>' )
+								
+								
+								//console.log(item.regDate)
+								//console.log(pageNumber)
+								//alert("11111111"+$(".ct_list_pop:last").html())
+								console.log(str)
+								
+						 		$("#abc").append(''+str+'') ;
+								 
+								//alert("222222222222222"+$(".ct_list_pop:last").html())
+								
+								
+							})
+						}
+				});
+	      
+	    }
+	});
+
 	
 });
 
@@ -119,7 +234,7 @@ $(function() {
 	<tr>
 	
 		<td align="right">
-		<select name="searchCondition" class="ct_input_g" style="width:80px">
+		<select name="searchCondition" id="searchCondition" class="ct_input_g" style="width:80px">
 			<%-- 	<option value="0" <%= (searchCondition.equals("0") ? "selected" : "")%>>상품번호</option>
 					<option value="1" <%= (searchCondition.equals("1") ? "selected" : "")%>>상품명</option>--%>
 					<option value="0" ${! empty search.searchCondition && search.searchCondition==0 ? "selected" : "" }>상품번호</option>
@@ -158,7 +273,7 @@ $(function() {
 	</tr>
 </table>
 
-<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">
+<table id="abc" width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">
 	<tr>
 		<td colspan="11" >전체 ${resultPage.totalCount } 건수, 현재  ${resultPage.currentPage } 페이지</td>
 	</tr>
@@ -191,7 +306,7 @@ $(function() {
 	<c:forEach var="product" items="${list}">
 	<c:set var="i" value="${i+1 }"/>
 	<tr class="ct_list_pop">
-			<td align="center">${ i }
+			<td align="center">${ i }</td>
 		<td></td>
 		<td align="left">
 			<!--  <a href="/product/getProduct?prodNo=${product.prodNo }&menu=${menu}">${product.prodName}</a>-->
@@ -228,32 +343,30 @@ $(function() {
 		</c:if>
 		<c:if test="${product.proTranCode=='0  '}">
 		<td align="left"> 
-		<!--  <a href="/purchase/updateTranCode?tranCode=${product.proTranCode}&prodNo=${product.prodNo}">배송하기</a>-->
+		
 		<div align="letf" >구매완료</div> 
 		<div align="letf" id="배송하기"><input type="hidden" name="prodNo" value="${product.prodNo }">
 		<input type="hidden" name="proTranCode" value="${product.proTranCode }">
 		(배송하기)</div> 
 		</c:if>
 		<c:if test="${product.proTranCode=='1  '}">
-			<td align="left">배송중
-		</td>	
+			<td align="left">배송중</td>	
 		</c:if>
 		<c:if test="${product.proTranCode=='2  '}">
-			<td align="left">배송완료
-		</td>	
+			<td align="left">배송완료</td>	
 		<td></td>
 		</c:if>
 		</c:if>
 		
 		<%--<%}else{ --%>
-		</td>	
+		
 		<%--<%} --%>
 	</tr>
-	<tr>
-	<!-- 	<td colspan="11" bgcolor="D6D7D6" height="1"></td> -->
-	<td id="${product.prodNo}view" colspan="11" bgcolor="D6D7D6" height="1"></td>
+	<tr >
+	
+	<td  id="${product.prodNo}view"  class="view" colspan="11" bgcolor="D6D7D6" height="1"></td>
 		</tr>
-	</tr>
+	
 	
 	<%--<% } --%>
 	</c:forEach>
@@ -265,14 +378,14 @@ $(function() {
 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">
 	<tr>
 	<td align="center">
-	<input type="hidden" id="currentPage" name="currentPage" value=""/>
+	<input type="hidden" id="currentPage" name="currentPage" value="1"/>
 	
 	<!-- jsp include 말고 EL의 import를 사용 해서 pageNavigator를 인터페이스화 시킴 .. 장점 어떤 page던 페이지 value(fnc)만 바꿔주면 다 사용가능 -->
-	<c:set var="fnc" value="fncGetProductList" scope="request" />
+	<%-- <c:set var="fnc" value="fncGetProductList" scope="request" />
 	
 	<c:import var="pageNavi" url="/common/pageNavigator.jsp" scope="request"/>
 	${pageNavi}
-	
+	 --%>
 	
 		
     	</td>

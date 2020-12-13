@@ -79,33 +79,24 @@ public class ProductRestController {
 		return productService.getProduct(prodNo);
 	}
 	@RequestMapping( value="json/getProductList" )
-	public Map getProductList( @RequestBody(required = false ) JSONObject jsonObject) throws Exception{
+	public Map getProductList( @RequestBody(required = false ) Search search) throws Exception{
 		
 		System.out.println("/product/json/getProductList : GET ,POST");
-		System.out.println("Not toString : "+jsonObject.get("search"));
-		System.out.println(jsonObject.get("search").toString());
+		if(search.getCurrentPage()==0) {
+			search.setCurrentPage(1);
+		}
+		search.setPageSize(pageSize);
+		System.out.println("서치는 ?? :"+search);
 		
-		
-		/*
-		 * Search search1 = (Search)(jsonObject.get("search"));
-		 * System.out.println(search1);
-		 */
-		ObjectMapper objectMapper = new ObjectMapper();
-		System.out.println("jssss"+jsonObject.get("search")); // jsobject get하면 오브젝트가온다
-		String jsonValue = objectMapper.writeValueAsString(jsonObject.get("search"));// mapper.writeValueAsString을 하면 오브젝트를 json String으로 바꾸어준다
-		System.out.println("jsonValue :: '"+jsonValue+"'");
-		
-		Search search = objectMapper.readValue(jsonValue, Search.class );//제이슨형태{key : value, key : value}를 바인딩해준다.
-		System.out.println("서치는"+search);
-		
-		System.out.println(search);
-		
-		/*if(search.getSearchCondition().equals("null") || search.getSearchCondition()==null) {
+		if(search.getSearchCondition()==null ||search.getSearchCondition().equals("null") ) {
 			search.setSearchCondition("");
 		}
-		if (search.getSearchKeyword().equals("null") || search.getSearchKeyword()==null) {
+		if (  search.getSearchKeyword()==null || search.getSearchKeyword().equals("null")) {
 			search.setSearchKeyword("");
-		}	*/	
+		}
+		System.out.println(search);
+		
+		
 		Map map = new HashMap<String, Object>();
 		
 		map =productService.getProductList(search); //map으로 담겨온다 List<User> user =(User)map.get("list") user[0],user[1],user[2]
