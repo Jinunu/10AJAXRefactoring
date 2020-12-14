@@ -106,13 +106,13 @@ $(function() {
 							//console.log("사이즈"+JSONData.list.length)
 							var pageNumber = $(".ct_list_pop td:nth-child(1):last").text().trim();
 							//console.log( $(".view:last"));
-							if(${menu}='manage'){
-								var menu = 'manage';
-							}else{
-								var menu = 'search'
-							}
 							
-							console.log(menu)
+								var menu = '${menu}';
+								
+							
+							
+							
+							//alert(${menu})
 							$.each(JSONData.list, function(index, item) {
 								//console.log(item.prodName);
 								//alert(item.proTranCode)
@@ -163,7 +163,7 @@ $(function() {
 								+'<tr >'
 								+'<td class="view" id="'+item.prodNo+'view" colspan="11" bgcolor="D6D7D6" height="1"></td>'
 								+'</tr>';
-								//console.log(pageNumber); // 다추가 해놓고 거기에 값을 변경 해주자 ..
+								//console.log(pageNumber);
 								//'<h1>pageNumber<h1>' )
 								
 								

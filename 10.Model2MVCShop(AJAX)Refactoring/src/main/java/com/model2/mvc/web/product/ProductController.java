@@ -187,6 +187,7 @@ public class ProductController {
 		modelAndView.addObject("list", map.get("list"));
 		modelAndView.addObject("resultPage", resultPage);
 		modelAndView.addObject("search", search);
+		//modelAndView.addObject("menu", menu);
 		
 		modelAndView.setViewName("forward:/product/listProduct.jsp");
 		//return "forward:/product/listProduct.jsp";
